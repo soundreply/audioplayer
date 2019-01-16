@@ -46,6 +46,11 @@ FlutterMethodChannel *_channel;
                                       [self play:url isLocal:isLocal];
                                       result(nil);
                                   },
+                              @"resume":
+                                  ^{
+                                      [self resume];
+                                      result(nil);
+                                  },
                               @"pause":
                                   ^{
                                       [self pause];
@@ -138,6 +143,12 @@ FlutterMethodChannel *_channel;
 - (void)onTimeInterval:(CMTime)time {
     int mseconds =  CMTimeGetSeconds(time)*1000;
     [_channel invokeMethod:@"audio.onCurrentPosition" arguments:@(mseconds)];
+}
+
+- (void)resume {
+    [player resume];
+    isPlaying = true;
+    [_channel invokeMethod:@"audio.onResume" arguments:@(mseconds)];
 }
 
 - (void)pause {
