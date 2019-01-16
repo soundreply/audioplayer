@@ -97,6 +97,10 @@ class AudioPlayer {
         _state = AudioPlayerState.STOPPED;
         _playerStateController.add(AudioPlayerState.STOPPED);
         break;
+      case "audio.onResume":
+        _state = AudioPlayerState.PLAYING;
+        _playerStateController.add(AudioPlayerState.PLAYING);
+        break;
       case "audio.onComplete":
         _state = AudioPlayerState.COMPLETED;
         _playerStateController.add(AudioPlayerState.COMPLETED);
