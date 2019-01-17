@@ -141,14 +141,17 @@ FlutterMethodChannel *_channel;
 }
 
 - (void)onTimeInterval:(CMTime)time {
-    int mseconds =  CMTimeGetSeconds(time)*1000;
-    [_channel invokeMethod:@"audio.onCurrentPosition" arguments:@(mseconds)];
+    position = time;
+    [_channel invokeMethod:@"audio.onCurrentPosition" arguments:@(CMTimeGetSeconds(time)*1000)];
 }
 
 - (void)resume {
-    [player resume];
-    isPlaying = true;
-    [_channel invokeMethod:@"audio.onResume" arguments:@(mseconds)];
+    [player seekToTime:position toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
+        [player play];
+        
+        isPlaying = true;
+        [_channel invokeMethod:@"audio.onResume" arguments:nil];
+    }];
 }
 
 - (void)pause {
