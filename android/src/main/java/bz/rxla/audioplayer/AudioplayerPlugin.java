@@ -97,7 +97,7 @@ public class AudioplayerPlugin implements MethodCallHandler {
   }
 
   private void resume() {
-    handler.post(sendData)
+    handler.post(sendData);
     if (mediaPlayer != null) {
       mediaPlayer.seekTo(currentPosition);
       mediaPlayer.start();
@@ -166,7 +166,7 @@ public class AudioplayerPlugin implements MethodCallHandler {
           handler.removeCallbacks(sendData);
         }
         int time = mediaPlayer.getCurrentPosition();
-        currentPosition = time
+        currentPosition = time;
         channel.invokeMethod("audio.onCurrentPosition", time);
         handler.postDelayed(this, 200);
       }
