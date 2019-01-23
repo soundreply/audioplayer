@@ -98,6 +98,11 @@ FlutterMethodChannel *_channel;
         }
         lastUrl = url;
         
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+        [audioSession setMode:AVAudioSessionModeDefault error:nil];
+        [audioSession setActive:true error:nil];
+        
         id anobserver = [[NSNotificationCenter defaultCenter] addObserverForName:AVPlayerItemDidPlayToEndTimeNotification
                                                                           object:playerItem
                                                                            queue:nil
@@ -167,6 +172,15 @@ FlutterMethodChannel *_channel;
     }
     [playerItem seekToTime:CMTimeMake(0, 1)];
     [_channel invokeMethod:@"audio.onStop" arguments:nil];
+    
+    [self _teardown];
+}
+
+- (void)_teardown {
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setCategory:AVAudioSessionCategoryAmbient error:nil];
+    [audioSession setMode:AVAudioSessionModeDefault error:nil];
+    [audioSession setActive:false error:nil];
 }
 
 - (void)mute:(BOOL)muted {
