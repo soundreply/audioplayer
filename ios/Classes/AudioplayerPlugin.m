@@ -99,7 +99,7 @@ FlutterMethodChannel *_channel;
         lastUrl = url;
         
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+        [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
         [audioSession setMode:AVAudioSessionModeDefault error:nil];
         [audioSession setActive:true error:nil];
         
