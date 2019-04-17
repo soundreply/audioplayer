@@ -27,6 +27,7 @@ public class AudioplayerPlugin implements MethodCallHandler {
   private final Handler handler = new Handler();
   private MediaPlayer mediaPlayer;
   private int currentPosition = 0;
+  private int enforcedPostion = 0;
 
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), ID);
@@ -99,9 +100,9 @@ public class AudioplayerPlugin implements MethodCallHandler {
   private void resume() {
     handler.post(sendData);
     if (mediaPlayer != null) {
-      mediaPlayer.seekTo(currentPosition);
+      channel.invokeMethod("audio.onResume", true);
+      enforcedPostion = currentPosition;
       mediaPlayer.start();
-      channel.invokeMethod("audio.onPause", true);
     }
   }
 
@@ -134,6 +135,12 @@ public class AudioplayerPlugin implements MethodCallHandler {
         public void onPrepared(MediaPlayer mp) {
           mediaPlayer.start();
           channel.invokeMethod("audio.onStart", mediaPlayer.getDuration());
+       
+          int duration = mediaPlayer.getDuration();
+          if (duration != -1 && enforcedPostion != 0) {
+            seek(enforcedPostion);
+            enforcedPostion = 0;  
+          }
         }
       });
 
@@ -165,6 +172,7 @@ public class AudioplayerPlugin implements MethodCallHandler {
         if (!mediaPlayer.isPlaying()) {
           handler.removeCallbacks(sendData);
         }
+       
         int time = mediaPlayer.getCurrentPosition();
         currentPosition = time;
         channel.invokeMethod("audio.onCurrentPosition", time);
