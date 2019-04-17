@@ -26,6 +26,8 @@ public class AudioplayerPlugin implements MethodCallHandler {
   private final AudioManager am;
   private final Handler handler = new Handler();
   private MediaPlayer mediaPlayer;
+  private int currentPosition = 0;
+  private int enforcedPostion = 0;
 
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), ID);
@@ -44,6 +46,10 @@ public class AudioplayerPlugin implements MethodCallHandler {
     switch (call.method) {
       case "play":
         play(call.argument("url").toString());
+        response.success(null);
+        break;
+      case "resume":
+        resume();
         response.success(null);
         break;
       case "pause":
@@ -91,9 +97,19 @@ public class AudioplayerPlugin implements MethodCallHandler {
     }
   }
 
+  private void resume() {
+    handler.post(sendData);
+    if (mediaPlayer != null) {
+      channel.invokeMethod("audio.onResume", true);
+      enforcedPostion = currentPosition;
+      mediaPlayer.start();
+    }
+  }
+
   private void pause() {
     handler.removeCallbacks(sendData);
     if (mediaPlayer != null) {
+      currentPosition = mediaPlayer.getCurrentPosition();
       mediaPlayer.pause();
       channel.invokeMethod("audio.onPause", true);
     }
@@ -119,6 +135,12 @@ public class AudioplayerPlugin implements MethodCallHandler {
         public void onPrepared(MediaPlayer mp) {
           mediaPlayer.start();
           channel.invokeMethod("audio.onStart", mediaPlayer.getDuration());
+       
+          int duration = mediaPlayer.getDuration();
+          if (duration != -1 && enforcedPostion != 0) {
+            seek(enforcedPostion);
+            enforcedPostion = 0;  
+          }
         }
       });
 
@@ -150,7 +172,9 @@ public class AudioplayerPlugin implements MethodCallHandler {
         if (!mediaPlayer.isPlaying()) {
           handler.removeCallbacks(sendData);
         }
+       
         int time = mediaPlayer.getCurrentPosition();
+        currentPosition = time;
         channel.invokeMethod("audio.onCurrentPosition", time);
         handler.postDelayed(this, 200);
       }
