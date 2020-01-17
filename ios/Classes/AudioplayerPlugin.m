@@ -149,7 +149,14 @@ FlutterMethodChannel *_channel;
 }
 
 - (void)resume {
-    [player seekToTime:position toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
+
+    // If time is invalid start at the beginning
+    CMTime time = position;
+    if (CMTIME_IS_INVALID(position)) {
+        time = CMTimeMakeWithSeconds(0, NSEC_PER_SEC)
+    }
+
+    [player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
         [player play];
         
         isPlaying = true;
