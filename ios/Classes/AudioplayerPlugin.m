@@ -153,7 +153,7 @@ FlutterMethodChannel *_channel;
     // If time is invalid start at the beginning
     CMTime time = position;
     if (CMTIME_IS_INVALID(position)) {
-        time = CMTimeMakeWithSeconds(0, NSEC_PER_SEC)
+        time = CMTimeMakeWithSeconds(0, NSEC_PER_SEC);
     }
 
     [player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
